@@ -1,25 +1,23 @@
 const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const corsMiddleware = require('./middleware/corsMiddleware')
+const connectDB = require('./config/db')
+const startServer = require('./config/server')
+const authRoutes = require('./routes/authRoutes')
 require('dotenv').config()
 
 const app = express()
 
+// Middleware
+app.use(corsMiddleware)
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}))
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.log('DB Error:', err))
+// Database
+connectDB()
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Xplore API is running' })
-})
+// Routes
+app.use('/api/auth', authRoutes)
 
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+
+startServer(app)
