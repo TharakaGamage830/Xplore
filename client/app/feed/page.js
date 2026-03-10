@@ -40,64 +40,77 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-12 text-center">
-          <h1 className="text-4xl font-extrabold mb-3">Discover Experiences</h1>
-          <p className="text-blue-100 text-lg">
-            Find unique travel experiences shared by explorers around the world
+      <div className="relative bg-slate-900 border-b border-transparent">
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+            alt="Travel background mountain" 
+            className="w-full h-full object-cover opacity-70"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/20 to-slate-900/60" />
+        </div>
+        
+        <div className="relative max-w-6xl mx-auto px-4 pt-24 pb-16 text-center z-10">
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
+            Go Boundless
+          </h1>
+          <p className="text-slate-100 text-xl md:text-2xl max-w-2xl mx-auto font-medium drop-shadow-md mb-12">
+            Discover hidden gems, connect with local explorers, and share your most unforgettable travel experiences.
           </p>
+          
+          {/* Search Bar Float */}
+          <div className="max-w-3xl mx-auto drop-shadow-2xl">
+            <form onSubmit={handleSearch} className="glass rounded-2xl p-3 flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </span>
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Where do you want to explore?"
+                  className="w-full bg-white/90 border-0 rounded-xl pl-14 pr-4 py-4 text-slate-800 placeholder:text-slate-500 focus:ring-2 focus:ring-teal-500 transition-all font-medium text-lg outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-10 py-4 rounded-xl text-lg font-bold hover:shadow-lg hover:shadow-teal-500/30 hover:-translate-y-0.5 transition-all w-full sm:w-auto"
+              >
+                Search
+              </button>
+              {search && (
+                 <button
+                   type="button"
+                   onClick={handleClear}
+                   className="bg-white/90 border border-slate-200 text-slate-600 px-8 py-4 rounded-xl text-lg hover:bg-slate-50 transition-colors w-full sm:w-auto font-semibold"
+                 >
+                   Clear
+                 </button>
+              )}
+            </form>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex gap-2 mb-8">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              🔍
-            </span>
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search by title, location or description..."
-              className="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
-          >
-            Search
-          </button>
-          {search && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="border border-gray-300 text-gray-600 px-4 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition"
-            >
-              Clear
-            </button>
-          )}
-        </form>
+      <div className="max-w-6xl mx-auto px-4 pt-12 pb-24 flex-1 w-full">
 
         {/* Search Result Info */}
         {search && !loading && (
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-slate-500 mb-6 font-medium bg-white px-4 py-2 rounded-lg inline-block shadow-sm">
             {listings.length} result{listings.length !== 1 ? 's' : ''} for{' '}
-            <span className="font-medium text-gray-700">"{search}"</span>
+            <span className="font-bold text-teal-700">"{search}"</span>
           </p>
         )}
 
         {/* Loading */}
         {loading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+          <div className="flex justify-center items-center py-32">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-teal-500"></div>
           </div>
         )}
 
