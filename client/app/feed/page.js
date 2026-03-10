@@ -43,13 +43,17 @@ export default function FeedPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Discover Experiences</h1>
-          <p className="text-gray-500 mt-1">Find unique travel experiences around the world</p>
+      {/* Hero Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+        <div className="max-w-6xl mx-auto px-4 py-12 text-center">
+          <h1 className="text-4xl font-extrabold mb-3">Discover Experiences</h1>
+          <p className="text-blue-100 text-lg">
+            Find unique travel experiences shared by explorers around the world
+          </p>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
 
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="flex gap-2 mb-8">
