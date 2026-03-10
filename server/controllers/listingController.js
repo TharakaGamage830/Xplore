@@ -63,10 +63,18 @@ exports.updateListing = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to update this listing' })
     }
 
+    const { title, location, imageUrl, description, price } = req.body
+    const updateData = {}
+    if (title !== undefined) updateData.title = title
+    if (location !== undefined) updateData.location = location
+    if (imageUrl !== undefined) updateData.imageUrl = imageUrl
+    if (description !== undefined) updateData.description = description
+    if (price !== undefined) updateData.price = price
+
     const updated = await Listing.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      updateData,
+      { new: true, runValidators: true }
     )
 
     res.status(200).json({ message: 'Listing updated successfully', listing: updated })
