@@ -17,12 +17,21 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [liked, setLiked] = useState(false)
+  const [likesCount, setLikesCount] = useState(0)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     const fetchListing = async () => {
       try {
         const res = await api.get(`/listings/${id}`)
-        setListing(res.data.listing)
+        const data = res.data.listing
+        setListing(data)
+        setLikesCount(data.likes?.length || 0)
+
+        if (user) {
+          setLiked(data.likes?.includes(user.id))
+        }
       } catch (err) {
         setError('Listing not found')
       } finally {
@@ -30,7 +39,20 @@ export default function ListingDetailPage() {
       }
     }
     fetchListing()
-  }, [id])
+  }, [id, user])
+
+  // Check saved status
+  useEffect(() => {
+    const checkSaved = async () => {
+      if (!user) return
+      try {
+        const res = await api.get('/listings/saved')
+        const savedIds = res.data.listings.map(l => l._id)
+        setSaved(savedIds.includes(id))
+      } catch (err) {}
+    }
+    checkSaved()
+  }, [id, user])
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this listing?')) return
@@ -44,9 +66,25 @@ export default function ListingDetailPage() {
     }
   }
 
+  const handleLike = async () => {
+    if (!user) { router.push('/login'); return }
+    try {
+      const res = await api.put(`/listings/${id}/like`)
+      setLiked(res.data.isLiked)
+      setLikesCount(res.data.likesCount)
+    } catch (err) {}
+  }
+
+  const handleSave = async () => {
+    if (!user) { router.push('/login'); return }
+    try {
+      const res = await api.put(`/listings/${id}/save`)
+      setSaved(res.data.isSaved)
+    } catch (err) {}
+  }
+
   const isOwner = user && listing && user.id === listing.createdBy?._id
 
-  // Loading
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -58,7 +96,6 @@ export default function ListingDetailPage() {
     )
   }
 
-  // Error
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -120,7 +157,32 @@ export default function ListingDetailPage() {
               {listing.description}
             </p>
 
-            {/* Creator Info */}
+            {/* Like & Save Buttons */}
+            <div className="flex gap-3 mb-6">
+              <button
+                onClick={handleLike}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  liked
+                    ? 'bg-red-50 text-red-500 hover:bg-red-100'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {liked ? '❤️' : '🤍'} {likesCount} {likesCount === 1 ? 'Like' : 'Likes'}
+              </button>
+
+              <button
+                onClick={handleSave}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  saved
+                    ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {saved ? '🔖 Saved' : '🔖 Save'}
+              </button>
+            </div>
+
+            {/* Creator Info + Owner Actions */}
             <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Posted by</p>
