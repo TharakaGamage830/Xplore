@@ -87,10 +87,10 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-50 flex flex-col">
         <Navbar />
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+        <div className="flex-1 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-teal-500"></div>
         </div>
       </div>
     )
@@ -98,12 +98,13 @@ export default function ListingDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-50 flex flex-col">
         <Navbar />
-        <div className="text-center py-20">
-          <p className="text-red-500 text-lg">{error}</p>
-          <Link href="/feed" className="text-blue-600 text-sm mt-4 inline-block hover:underline">
-            ← Back to Feed
+        <div className="flex-1 flex flex-col justify-center items-center text-center px-4">
+          <span className="text-6xl mb-4">🏜️</span>
+          <p className="text-slate-600 text-xl font-medium mb-6">{error}</p>
+          <Link href="/feed" className="bg-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-600 transition-colors shadow-md">
+            ← Back to Explore
           </Link>
         </div>
       </div>
@@ -111,85 +112,98 @@ export default function ListingDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 w-full flex-1">
 
         {/* Back Button */}
-        <Link href="/feed" className="text-blue-600 text-sm hover:underline mb-6 inline-block">
-          ← Back to Feed
+        <Link href="/feed" className="inline-flex items-center gap-2 text-slate-500 font-medium hover:text-teal-600 transition-colors mb-6 group">
+          <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Feed
         </Link>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="glass rounded-3xl shadow-xl overflow-hidden border border-white/60">
 
-          {/* Image */}
-          <div className="h-72 overflow-hidden">
+          {/* Image Header */}
+          <div className="h-[400px] md:h-[500px] relative overflow-hidden group">
             <img
-              src={listing.imageUrl}
+              src={listing.imageUrl || 'https://images.unsplash.com/photo-1504280390267-31422abeb8e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'}
               alt={listing.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             />
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-
-            {/* Location */}
-            <p className="text-blue-600 text-sm font-medium uppercase tracking-wide mb-2">
-              📍 {listing.location}
-            </p>
-
-            {/* Title + Price */}
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {listing.title}
-              </h1>
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none" />
+            
+            {/* Overlay Location & Price */}
+            <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+              <div>
+                <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider mb-3 shadow-lg">
+                  📍 {listing.location}
+                </span>
+                <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-tight drop-shadow-md">
+                  {listing.title}
+                </h1>
+              </div>
               {listing.price && (
-                <span className="bg-blue-50 text-blue-700 font-bold text-lg px-4 py-1 rounded-full whitespace-nowrap">
+                <span className="bg-gradient-to-r from-teal-400 to-cyan-500 text-white font-black text-2xl md:text-3xl px-6 py-2 rounded-2xl shadow-xl border border-white/20">
                   ${listing.price}
                 </span>
               )}
             </div>
+          </div>
+
+          {/* Content Body */}
+          <div className="p-8 md:p-10 bg-white">
 
             {/* Description */}
-            <p className="text-gray-600 leading-relaxed mb-6">
+            <h3 className="text-xl font-bold text-slate-800 mb-4 font-heading">About this Experience</h3>
+            <p className="text-slate-600 leading-relaxed text-lg mb-10 whitespace-pre-wrap">
               {listing.description}
             </p>
 
-            {/* Like & Save Buttons */}
-            <div className="flex gap-3 mb-6">
-              <button
-                onClick={handleLike}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  liked
-                    ? 'bg-red-50 text-red-500 hover:bg-red-100'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {liked ? '❤️' : '🤍'} {likesCount} {likesCount === 1 ? 'Like' : 'Likes'}
-              </button>
+            {/* Actions Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-6 py-6 border-y border-slate-100 mb-8">
+              
+              <div className="flex gap-4">
+                <button
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-sm border ${
+                    liked
+                      ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100 hover:shadow-md'
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
+                >
+                  <span className={`text-xl ${liked ? 'scale-110' : ''} transition-transform`}>{liked ? '❤️' : '🤍'}</span>
+                  <span>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</span>
+                </button>
 
-              <button
-                onClick={handleSave}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  saved
-                    ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {saved ? '🔖 Saved' : '🔖 Save'}
-              </button>
+                <button
+                  onClick={handleSave}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-sm border ${
+                    saved
+                      ? 'bg-teal-50 text-teal-600 border-teal-200 hover:bg-teal-100 hover:shadow-md'
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
+                >
+                  <span className="text-xl">🔖</span> {saved ? 'Saved' : 'Save for later'}
+                </button>
+              </div>
+
             </div>
 
             {/* Creator Info + Owner Actions */}
-            <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Posted by</p>
-                <p className="text-gray-800 font-medium">{listing.createdBy?.name}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {formatDistanceToNow(new Date(listing.createdAt), { addSuffix: true })}
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 border-2 border-teal-200 flex items-center justify-center text-teal-700 font-bold text-xl shadow-inner">
+                  {listing.createdBy?.name?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 font-medium">Experience curated by</p>
+                  <p className="text-slate-900 font-bold text-lg">{listing.createdBy?.name}</p>
+                  <p className="text-xs text-slate-400 font-medium mt-1">
+                    Posted {formatDistanceToNow(new Date(listing.createdAt), { addSuffix: true })}
+                  </p>
+                </div>
               </div>
 
               {/* Owner Actions */}
@@ -197,16 +211,16 @@ export default function ListingDetailPage() {
                 <div className="flex gap-3">
                   <Link
                     href={`/listings/${id}/edit`}
-                    className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-200 transition"
+                    className="bg-slate-100 text-slate-700 font-semibold px-6 py-3 rounded-xl hover:bg-slate-200 transition-colors shadow-sm"
                   >
                     Edit
                   </Link>
                   <button
                     onClick={handleDelete}
                     disabled={deleting}
-                    className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg hover:bg-red-100 transition disabled:opacity-50"
+                    className="bg-rose-50 text-rose-600 font-semibold px-6 py-3 rounded-xl hover:bg-rose-100 border border-rose-100 transition-colors disabled:opacity-50 shadow-sm"
                   >
-                    {deleting ? 'Deleting...' : 'Delete'}
+                    {deleting ? 'Removing...' : 'Delete'}
                   </button>
                 </div>
               )}
