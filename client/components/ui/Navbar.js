@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 
 export default function Navbar() {
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -21,22 +21,24 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/feed" className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 tracking-tight flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <span className="text-2xl text-black">✈️</span> Xplore
+          <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/20">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+          </div>
+          Xplore
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden sm:flex items-center gap-4">
-          {user ? (
+          {loading ? (
+            <div className="flex items-center gap-4">
+              <div className="w-24 h-4 bg-slate-100 animate-pulse rounded-md" />
+              <div className="w-20 h-9 bg-slate-100 animate-pulse rounded-xl" />
+            </div>
+          ) : user ? (
             <>
               <span className="text-sm text-slate-500 font-medium">
                 Hi, <span className="font-bold text-slate-800">{user.name}</span>
               </span>
-              <Link
-                href="/create"
-                className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-teal-500/30 hover:-translate-y-0.5 transition-all font-semibold"
-              >
-                + New Listing
-              </Link>
               <button
                 onClick={handleLogout}
                 className="text-sm text-slate-500 hover:text-red-500 font-medium transition-colors"
@@ -79,18 +81,16 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="sm:hidden bg-white/95 backdrop-blur-md border-t border-slate-100 px-4 py-4 flex flex-col gap-4 shadow-xl absolute w-full test-mobile-menu">
-          {user ? (
+          {loading ? (
+            <div className="flex flex-col gap-3 px-2 py-2">
+              <div className="w-24 h-4 bg-slate-100 animate-pulse rounded-md" />
+              <div className="w-full h-10 bg-slate-100 animate-pulse rounded-xl" />
+            </div>
+          ) : user ? (
             <>
               <p className="text-sm text-slate-500 px-2">
                 Hi, <span className="font-bold text-slate-800">{user.name}</span>
               </p>
-              <Link
-                href="/create"
-                onClick={() => setMenuOpen(false)}
-                className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm px-4 py-3 rounded-xl text-center font-semibold shadow-md"
-              >
-                + New Listing
-              </Link>
               <button
                 onClick={() => { handleLogout(); setMenuOpen(false) }}
                 className="text-sm text-red-500 text-left font-medium px-2 py-2 hover:bg-red-50 rounded-lg transition-colors"
