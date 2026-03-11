@@ -5,7 +5,7 @@ const User = require('../models/User')
 // Get all listings - newest first, with search and pagination
 exports.getAllListings = async (req, res) => {
   try {
-    const { search, page = 1, limit = 10 } = req.query
+    const { search, page = 1, limit = 10, tab } = req.query
 
     // Build filter for search
     const filter = {}
@@ -16,6 +16,14 @@ exports.getAllListings = async (req, res) => {
         { location: searchRegex },
         { description: searchRegex }
       ]
+    }
+
+    // Filter by tab if needed
+    if (tab === 'liked') {
+      filter.likes = req.user.id
+    } else if (tab === 'saved') {
+      const user = await User.findById(req.user.id)
+      filter._id = { $in: user.savedListings }
     }
 
     const pageNum = parseInt(page)
@@ -213,3 +221,36 @@ exports.getSavedListings = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message })
   }
 }
+
+// Get liked listings for current user
+exports.getLikedListings = async (req, res) => {
+  try {
+    const listings = await Listing.find({ likes: req.user.id })
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 })
+
+    res.status(200).json({ listings })
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message })
+  }
+}
+
+// Get users who liked a listing (Author only)
+exports.getListingLikes = async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id)
+      .populate('likes', 'name email')
+
+    if (!listing) {
+      return res.status(404).json({ message: 'Listing not found' })
+    }
+
+    if (listing.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to view likes' })
+    }
+
+    res.status(200).json({ likes: listing.likes })
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message })
+  }
+}
