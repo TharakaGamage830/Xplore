@@ -20,10 +20,13 @@ exports.getAllListings = async (req, res) => {
 
     // Filter by tab if needed
     if (tab === 'liked') {
+      if (!req.user) return res.status(401).json({ message: 'Authentication required' })
       filter.likes = req.user.id
     } else if (tab === 'saved') {
+      if (!req.user) return res.status(401).json({ message: 'Authentication required' })
       const user = await User.findById(req.user.id)
-      filter._id = { $in: user.savedListings }
+      if (!user) return res.status(404).json({ message: 'User not found' })
+      filter._id = { $in: user.savedListings || [] }
     }
 
     const pageNum = parseInt(page)
@@ -210,14 +213,23 @@ exports.toggleSave = async (req, res) => {
 // Get saved listings for current user
 exports.getSavedListings = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
+
     const user = await User.findById(req.user.id)
       .populate({
         path: 'savedListings',
         populate: { path: 'createdBy', select: 'name email' }
       })
 
-    res.status(200).json({ listings: user.savedListings })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json({ listings: user.savedListings || [] })
   } catch (err) {
+    console.error('getSavedListings Error:', err)
     res.status(500).json({ message: 'Server error', error: err.message })
   }
 }
@@ -225,12 +237,17 @@ exports.getSavedListings = async (req, res) => {
 // Get liked listings for current user
 exports.getLikedListings = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
+
     const listings = await Listing.find({ likes: req.user.id })
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 })
 
-    res.status(200).json({ listings })
+    res.status(200).json({ listings: listings || [] })
   } catch (err) {
+    console.error('getLikedListings Error:', err)
     res.status(500).json({ message: 'Server error', error: err.message })
   }
 }

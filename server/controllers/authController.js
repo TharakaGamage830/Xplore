@@ -46,16 +46,19 @@ exports.login = async (req, res) => {
     const { email, password } = req.body
 
     if (!email || !password) {
+      console.warn('Login attempt with missing credentials:', { hasEmail: !!email, hasPassword: !!password })
       return res.status(400).json({ message: 'Please provide email and password' })
     }
 
     const user = await User.findOne({ email })
     if (!user) {
+      console.warn('Login failed: User not found for email:', email)
       return res.status(400).json({ message: 'Invalid email or password' })
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
+      console.warn('Login failed: Invalid password for email:', email)
       return res.status(400).json({ message: 'Invalid email or password' })
     }
 
@@ -63,6 +66,7 @@ exports.login = async (req, res) => {
     const token = generateToken(user)
     sendTokenCookie(res, token)
 
+    console.log('User logged in successfully:', user.email)
     res.status(200).json({
       message: 'Login successful',
       user: {
@@ -73,6 +77,7 @@ exports.login = async (req, res) => {
     })
 
   } catch (err) {
+    console.error('Login Error:', err)
     res.status(500).json({ message: 'Server error', error: err.message })
   }
 }
@@ -85,8 +90,12 @@ exports.logout = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password')
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
     res.status(200).json({ user })
   } catch (err) {
+    console.error('getMe Error:', err)
     res.status(500).json({ message: 'Server error', error: err.message })
   }
 }

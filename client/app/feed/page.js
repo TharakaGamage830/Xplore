@@ -9,9 +9,10 @@ import ListingSkeleton from '@/components/listings/ListingSkeleton'
 import api from '@/lib/api'
 
 export default function FeedPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isFiltering, setIsFiltering] = useState(false)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -19,14 +20,21 @@ export default function FeedPage() {
 
   useEffect(() => {
     const fetchListings = async () => {
-      setLoading(true)
       try {
+        // Only show skeleton for initial load OR if switching to a tab with no data yet
+        if (listings.length === 0) {
+          setLoading(true)
+        } else {
+          setIsFiltering(true)
+        }
+
+        setError('')
         let endpoint = '/listings'
         let params = { search }
-        
+
         if (activeTab === 'saved') {
           endpoint = '/listings/saved'
-          params = {} // Saved often doesn't need search for now
+          params = {}
         } else if (activeTab === 'liked') {
           endpoint = '/listings/liked'
           params = {}
@@ -35,9 +43,11 @@ export default function FeedPage() {
         const res = await api.get(endpoint, { params })
         setListings(res.data.listings)
       } catch (err) {
+        console.error('Fetch error:', err)
         setError('Failed to load listings')
       } finally {
         setLoading(false)
+        setIsFiltering(false)
       }
     }
     fetchListings()
@@ -134,10 +144,13 @@ export default function FeedPage() {
         )}
 
         {/* Tab Switcher & Actions */}
-        {loading || (user && !loading) ? (
+        {(authLoading || user) && (
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 w-fit">
-              {loading ? (
+            <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 w-fit relative">
+              {isFiltering && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-500 rounded-full animate-ping z-30" />
+              )}
+              {authLoading ? (
                 <div className="flex gap-2 px-6 py-2.5">
                   <div className="w-20 h-5 bg-slate-100 animate-pulse rounded-md" />
                   <div className="w-20 h-5 bg-slate-100 animate-pulse rounded-md" />
@@ -173,7 +186,7 @@ export default function FeedPage() {
               </Link>
             )}
           </div>
-        ) : null}
+        )}
 
         {/* Loading Skeleton Grid */}
         {loading && (
@@ -189,7 +202,7 @@ export default function FeedPage() {
           <div className="text-center py-20 text-red-500">{error}</div>
         )}
 
-        {!loading && !error && listings.length === 0 && (
+        {!loading && !isFiltering && !error && listings.length === 0 && (
           <div className="text-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm px-6">
             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
                {activeTab === 'saved' ? (

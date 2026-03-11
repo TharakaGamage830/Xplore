@@ -9,7 +9,7 @@ export default function ListingCard({ listing }) {
   const [showLikes, setShowLikes] = useState(false)
   
   const timeAgo = formatDistanceToNow(new Date(listing.createdAt), { addSuffix: true })
-  const isAuthor = user && user.id === listing.createdBy?._id
+  const isAuthor = user && user.id?.toString() === listing.createdBy?._id?.toString()
   const likesCount = listing.likes?.length || 0
 
   return (
