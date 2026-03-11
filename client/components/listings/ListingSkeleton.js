@@ -2,13 +2,13 @@ export default function ListingSkeleton() {
   return (
     <div suppressHydrationWarning className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col animate-pulse">
       {/* Image Skeleton */}
-      <div className="h-56 bg-slate-100" />
+      <div suppressHydrationWarning className="h-56 bg-slate-100" />
 
       {/* Content Skeleton */}
-      <div className="p-5 flex flex-col flex-1 relative bg-white">
+      <div suppressHydrationWarning className="p-5 flex flex-col flex-1 relative bg-white">
         
         {/* Location Badge Skeleton */}
-        <div className="absolute -top-5 left-4 bg-white px-3 py-1.5 rounded-full shadow-md border border-slate-50 flex items-center gap-2 z-10 w-24 h-8" />
+        <div suppressHydrationWarning className="absolute -top-5 left-4 bg-white px-3 py-1.5 rounded-full shadow-md border border-slate-50 flex items-center gap-2 z-10 w-24 h-8" />
 
         <div className="mt-4 space-y-3">
           {/* Title Skeleton */}

@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import Navbar from '@/components/ui/Navbar'
 import ListingCard from '@/components/listings/ListingCard'
 import ListingSkeleton from '@/components/listings/ListingSkeleton'
-import api from '@/lib/api'
+import { getListings, getSavedListings, getLikedListings } from '@/lib/api'
 
 export default function FeedPage() {
   const { user, loading: authLoading } = useAuth()
@@ -17,41 +18,54 @@ export default function FeedPage() {
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [activeTab, setActiveTab] = useState('explore') // explore, saved, liked
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+
+  useEffect(() => {
+    // Reset page and listings when tab or search changes
+    setPage(1)
+    setListings([])
+    setHasMore(true)
+  }, [search, activeTab])
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        // Only show skeleton for initial load OR if switching to a tab with no data yet
-        if (listings.length === 0) {
+        const isInitialLoad = page === 1 && listings.length === 0;
+        
+        if (isInitialLoad) {
           setLoading(true)
         } else {
-          setIsFiltering(true)
+          setIsLoadingMore(true)
         }
 
         setError('')
-        let endpoint = '/listings'
-        let params = { search }
-
+        let res;
         if (activeTab === 'saved') {
-          endpoint = '/listings/saved'
-          params = {}
+          res = await getSavedListings({ page, limit: 9 })
         } else if (activeTab === 'liked') {
-          endpoint = '/listings/liked'
-          params = {}
+          res = await getLikedListings({ page, limit: 9 })
+        } else {
+          res = await getListings({ search, page, limit: 9 })
         }
-
-        const res = await api.get(endpoint, { params })
-        setListings(res.data.listings)
+        
+        const newListings = res.data.listings || []
+        const pagination = res.data.pagination || {}
+        
+        setListings(prev => page === 1 ? newListings : [...prev, ...newListings])
+        setHasMore(pagination.current < pagination.pages)
       } catch (err) {
         console.error('Fetch error:', err)
         setError('Failed to load listings')
       } finally {
         setLoading(false)
         setIsFiltering(false)
+        setIsLoadingMore(false)
       }
     }
     fetchListings()
-  }, [search, activeTab])
+  }, [search, activeTab, page])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -76,17 +90,20 @@ export default function FeedPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div suppressHydrationWarning className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
 
 
       {/* Hero Banner */}
-      <div className="relative bg-slate-900 border-b border-transparent">
+      <div className="relative bg-slate-900 border-b border-transparent min-h-[400px]">
         <div className="absolute inset-0">
-          <img 
+          <Image 
             src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
             alt="Travel background mountain" 
-            className="w-full h-full object-cover opacity-70"
+            fill
+            priority
+            className="object-cover opacity-70"
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/20 to-slate-900/60" />
         </div>
@@ -134,7 +151,7 @@ export default function FeedPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pt-12 pb-24 flex-1 w-full">
+      <div suppressHydrationWarning className="max-w-6xl mx-auto px-4 pt-12 pb-24 flex-1 w-full">
 
         {search && !loading && (activeTab === 'explore') && (
           <p className="text-sm text-slate-500 mb-6 font-medium bg-white px-4 py-2 rounded-lg inline-block shadow-sm">
@@ -146,9 +163,9 @@ export default function FeedPage() {
         {/* Tab Switcher & Actions */}
         {(authLoading || user) && (
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 w-fit relative">
+            <div suppressHydrationWarning className="flex items-center gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 w-fit relative">
               {isFiltering && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-500 rounded-full animate-ping z-30" />
+                <div suppressHydrationWarning className="absolute -top-1 -right-1 w-3 h-3 bg-teal-500 rounded-full animate-ping z-30" />
               )}
               {authLoading ? (
                 <div className="flex gap-2 px-6 py-2.5">
@@ -239,10 +256,35 @@ export default function FeedPage() {
 
         {/* Grid */}
         {!loading && !error && listings.length > 0 && (
-          <div suppressHydrationWarning className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing) => (
-              <ListingCard key={listing._id} listing={listing} />
-            ))}
+          <div className="space-y-12">
+            <div suppressHydrationWarning className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {listings.map((listing) => (
+                <ListingCard key={listing._id} listing={listing} />
+              ))}
+            </div>
+
+            {/* Load More */}
+            {hasMore && (
+              <div className="flex justify-center pt-8">
+                <button
+                  onClick={() => setPage(prev => prev + 1)}
+                  disabled={isLoadingMore}
+                  className="px-10 py-4 bg-white border border-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm flex items-center gap-3 disabled:opacity-50"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <div className="w-5 h-5 border-3 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
+                      <span>Loading more...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Load More Experiences</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         )}
 

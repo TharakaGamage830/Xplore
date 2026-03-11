@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const express = require('express')
+const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const corsMiddleware = require('./middleware/corsMiddleware')
 const connectDB = require('./config/db')
@@ -11,6 +12,7 @@ const listingRoutes = require('./routes/listingRoutes')
 const app = express()
 
 // Middleware
+app.use(compression())
 app.use(corsMiddleware)
 app.use(express.json())
 app.use(cookieParser())

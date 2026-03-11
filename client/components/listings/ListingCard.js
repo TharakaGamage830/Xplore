@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
@@ -17,11 +18,13 @@ export default function ListingCard({ listing }) {
       <div suppressHydrationWarning className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300 overflow-hidden cursor-pointer group h-full flex flex-col hover:-translate-y-1">
         <Link href={`/listings/${listing._id}`} className="flex-1 flex flex-col">
           {/* Image */}
-          <div className="h-56 overflow-hidden relative">
-            <img
+          <div className="h-56 overflow-hidden relative bg-slate-100">
+            <Image
               src={listing.imageUrl || 'https://images.unsplash.com/photo-1504280390267-31422abeb8e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}
               alt={listing.title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+              fill
+              className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             

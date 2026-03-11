@@ -17,22 +17,22 @@ export default function Navbar() {
 
   return (
     <nav className="glass sticky top-0 z-50 transition-all duration-300">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div suppressHydrationWarning className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/feed" className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 tracking-tight flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/20">
+          <div suppressHydrationWarning className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/20">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
           </div>
           Xplore
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden sm:flex items-center gap-4">
+        <div suppressHydrationWarning className="hidden sm:flex items-center gap-4">
           {loading ? (
-            <div className="flex items-center gap-4">
-              <div className="w-24 h-4 bg-slate-100 animate-pulse rounded-md" />
-              <div className="w-20 h-9 bg-slate-100 animate-pulse rounded-xl" />
+            <div suppressHydrationWarning className="flex items-center gap-4">
+              <div suppressHydrationWarning className="w-24 h-4 bg-slate-100 animate-pulse rounded-md" />
+              <div suppressHydrationWarning className="w-20 h-9 bg-slate-100 animate-pulse rounded-xl" />
             </div>
           ) : user ? (
             <>

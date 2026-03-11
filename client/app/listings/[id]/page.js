@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import Navbar from '@/components/ui/Navbar'
-import api from '@/lib/api'
+import { getListingById, getSavedListings, toggleLikeListing, toggleSaveListing, deleteListing as deleteListingApi } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 
 export default function ListingDetailPage() {
@@ -24,7 +25,7 @@ export default function ListingDetailPage() {
   useEffect(() => {
     const fetchListing = async () => {
       try {
-        const res = await api.get(`/listings/${id}`)
+        const res = await getListingById(id)
         const data = res.data.listing
         setListing(data)
         setLikesCount(data.likes?.length || 0)
@@ -46,7 +47,7 @@ export default function ListingDetailPage() {
     const checkSaved = async () => {
       if (!user) return
       try {
-        const res = await api.get('/listings/saved')
+        const res = await getSavedListings()
         const savedIds = res.data.listings.map(l => l._id)
         setSaved(savedIds.includes(id))
       } catch (err) {}
@@ -58,7 +59,7 @@ export default function ListingDetailPage() {
     if (!confirm('Are you sure you want to delete this listing?')) return
     setDeleting(true)
     try {
-      await api.delete(`/listings/${id}`)
+      await deleteListingApi(id)
       router.push('/feed')
     } catch (err) {
       alert('Failed to delete listing')
@@ -69,7 +70,7 @@ export default function ListingDetailPage() {
   const handleLike = async () => {
     if (!user) { router.push('/login'); return }
     try {
-      const res = await api.put(`/listings/${id}/like`)
+      const res = await toggleLikeListing(id)
       setLiked(res.data.isLiked)
       setLikesCount(res.data.likesCount)
     } catch (err) {}
@@ -78,7 +79,7 @@ export default function ListingDetailPage() {
   const handleSave = async () => {
     if (!user) { router.push('/login'); return }
     try {
-      const res = await api.put(`/listings/${id}/save`)
+      const res = await toggleSaveListing(id)
       setSaved(res.data.isSaved)
     } catch (err) {}
   }
@@ -125,11 +126,14 @@ export default function ListingDetailPage() {
         <div className="glass rounded-3xl shadow-xl overflow-hidden border border-white/60">
 
           {/* Image Header */}
-          <div className="h-[400px] md:h-[500px] relative overflow-hidden group">
-            <img
+          <div className="h-[400px] md:h-[500px] relative overflow-hidden group bg-slate-100">
+            <Image
               src={listing.imageUrl || 'https://images.unsplash.com/photo-1504280390267-31422abeb8e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'}
               alt={listing.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              fill
+              priority
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none" />
             

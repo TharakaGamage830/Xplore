@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import api from '@/lib/api'
+import { getListingLikes } from '@/lib/api'
 
 export default function LikedByModal({ listingId, onClose }) {
   const [likes, setLikes] = useState([])
@@ -10,7 +10,7 @@ export default function LikedByModal({ listingId, onClose }) {
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const res = await api.get(`/listings/${listingId}/likes`)
+        const res = await getListingLikes(listingId)
         setLikes(res.data.likes)
       } catch (err) {
         console.error('Failed to fetch likes', err)
