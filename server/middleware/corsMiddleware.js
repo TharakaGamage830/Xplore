@@ -1,7 +1,18 @@
 const cors = require('cors')
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.CLIENT_URL
+].filter(Boolean)
+
 const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`))
+    }
+  },
   credentials: true
 }
 
