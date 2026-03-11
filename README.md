@@ -9,7 +9,7 @@ The main idea behind Xplore is to bridge the gap between small travel operators 
 
 ## Tech Stack
 MERN stack is used to keep the development fast and simple:
-* Frontend: Next.js (App Router), Tailwind CSS
+* Frontend: Next.js, Tailwind CSS
 * Backend: Node.js, Express.js (with Gzip compression)
 * Database: MongoDB with Mongoose
 * Auth: JWT-based authentication with secure cookies
@@ -19,7 +19,7 @@ MERN stack is used to keep the development fast and simple:
 
 **Tech Stack Choice**
 
-Next.js was selected as the frontend framework primarily because it was the recommended technology stack for this challenge. Although Next.js was a completely new technology to learn, the project provided a great opportunity to explore its App Router, file-based routing, and built-in image optimization features. Choosing this stack ensured the application follows modern web standards while pushing for personal technical growth. Node.js with Express keeps the backend simple for setting up API routes without a lot of boilerplate. MongoDB was the right fit for travel listings since each listing can have slightly different fields, and a document-based database handles that naturally without needing schema migrations.
+Next.js was selected as the frontend framework primarily because it was the recommended technology stack for this challenge. Although Next.js was a completely new technology for me to learn, the project provided a great opportunity to explore its App Router, file-based routing, and built-in image optimization features. Choosing this stack ensured the application follows modern web standards while pushing for personal technical growth. Node.js with Express keeps the backend simple for setting up API routes without a lot of boilerplate. MongoDB was the right fit for travel listings since each listing can have slightly different fields, and a document-based database handles that naturally without needing schema migrations.
 
 **Authentication**
 
@@ -40,7 +40,7 @@ If the platform grows to 10,000 listings, the current way of loading data will s
 Core and most of the optional features are working smoothly:
 
 ### Core Features:
-* Registration & Login: Users can join up and stay logged in securely.
+* Registration & Login: Users can sign up and stay logged in securely.
 * Create Listings: Logged-in users can post experiences with titles, locations, images, and descriptions.
 * Public Feed: Everyone can see the listings, showing the newest ones first.
 * Detail View: Clicking any card shows full details, price, and the creator.
